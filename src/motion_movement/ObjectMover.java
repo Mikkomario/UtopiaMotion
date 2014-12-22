@@ -7,6 +7,7 @@ import exodus_object.DependentGameObject;
 import exodus_util.Transformation;
 import genesis_event.Actor;
 import genesis_event.HandlerRelay;
+import genesis_util.HelpMath;
 import genesis_util.Vector2D;
 
 /**
@@ -136,5 +137,38 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 	public void negateImpulses()
 	{
 		this.impulses.clear();
+	}
+	
+	/**
+	 * Changes the velocity of the object along the given axis
+	 * @param v The new directional movement of the object. Will only affect velocity parallel 
+	 * to the given vector.
+	 */
+	public void setDirectionalVelocity(Vector2D v)
+	{
+		Vector2D directionalVelocity = getVelocity().vectorProjection(v);
+		setVelocity(getVelocity().plus(v.minus(directionalVelocity)));
+	}
+	
+	/**
+	 * Stops the object along the given axis
+	 * @param direction The axis on which the object is stopped
+	 */
+	public void negateDirectionalVelocity(Vector2D direction)
+	{
+		Vector2D directionalVelocity = getVelocity().vectorProjection(direction);
+		// Only negates the velocity if it is towards the given direction
+		if (HelpMath.getAngleDifference180(direction.getDirection(), 
+				directionalVelocity.getDirection()) < 90)
+			setVelocity(getVelocity().minus(directionalVelocity));
+	}
+	
+	/**
+	 * Stops the object along the given axis
+	 * @param direction The direction on which the object is stopped
+	 */
+	public void negateDirectionalVelocity(double direction)
+	{
+		negateDirectionalVelocity(Vector2D.unitVector(direction));
 	}
 }
