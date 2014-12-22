@@ -6,6 +6,8 @@ import java.awt.geom.AffineTransform;
 
 import motion_movement.Movable;
 import motion_movement.ObjectMover;
+import motion_movement.ObjectRotator;
+import motion_movement.Rotateable;
 import exodus_object.SimpleGameObject;
 import exodus_util.Transformation;
 import genesis_event.Actor;
@@ -23,7 +25,7 @@ import genesis_util.Vector2D;
  * @since 22.12.2014
  */
 public class TestMouseFollowerMovable extends SimpleGameObject implements
-		Movable, AdvancedMouseListener, Actor, Drawable
+		Movable, AdvancedMouseListener, Actor, Drawable, Rotateable
 {
 	// ATTRIBUTES	--------------------------
 	
@@ -31,6 +33,7 @@ public class TestMouseFollowerMovable extends SimpleGameObject implements
 	private EventSelector<AdvancedMouseEvent> selector;
 	private ObjectMover mover;
 	private Vector2D lastMousePosition;
+	private ObjectRotator rotator;
 	
 	
 	// CONSTRUCTOR	---------------------------
@@ -47,6 +50,7 @@ public class TestMouseFollowerMovable extends SimpleGameObject implements
 		this.selector = AdvancedMouseEvent.createMouseMoveSelector();
 		this.mover = new ObjectMover(this, handlers);
 		this.lastMousePosition = Vector2D.zeroVector();
+		this.rotator = new ObjectRotator(this, handlers);
 	}
 	
 	
@@ -115,6 +119,10 @@ public class TestMouseFollowerMovable extends SimpleGameObject implements
 			// Stops if too far to the right
 			if (getTransformation().getPosition().getFirst() > 500)
 				getMover().negateDirectionalVelocity(new Vector2D(1, 0));
+			
+			// Changes the rotation speed
+			getRotator().increaseRotation(getMover().getVelocity().getLength() * 0.01);
+			getRotator().diminishRotation(0.05);
 		}
 	}
 
@@ -126,7 +134,7 @@ public class TestMouseFollowerMovable extends SimpleGameObject implements
 			g2d.setColor(Color.BLACK);
 			AffineTransform lastTransform = g2d.getTransform();
 			getTransformation().transform(g2d);
-			g2d.drawOval(-10, -10, 20, 20);
+			g2d.drawRect(-10, -10, 20, 20);
 			//System.out.println("Drawing");
 			g2d.setTransform(lastTransform);
 		}
@@ -148,5 +156,11 @@ public class TestMouseFollowerMovable extends SimpleGameObject implements
 	public void setDepth(int depth)
 	{
 		// Not happening
+	}
+
+	@Override
+	public ObjectRotator getRotator()
+	{
+		return this.rotator;
 	}
 }
