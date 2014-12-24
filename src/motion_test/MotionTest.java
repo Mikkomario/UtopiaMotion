@@ -1,6 +1,6 @@
 package motion_test;
 
-import exodus_util.Transformation;
+import omega_util.Transformation;
 import genesis_event.ActorHandler;
 import genesis_event.DrawableHandler;
 import genesis_event.HandlerRelay;

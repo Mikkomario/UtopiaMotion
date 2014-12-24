@@ -1,7 +1,7 @@
 package motion_movement;
 
-import exodus_object.GameObject;
-import exodus_util.Transformable;
+import omega_util.GameObject;
+import omega_util.Transformable;
 
 /**
  * RotateAble objects can be rotated by objectRotators

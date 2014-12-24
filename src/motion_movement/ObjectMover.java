@@ -3,8 +3,8 @@ package motion_movement;
 import java.util.ArrayList;
 import java.util.List;
 
-import exodus_object.DependentGameObject;
-import exodus_util.Transformation;
+import omega_util.DependentGameObject;
+import omega_util.Transformation;
 import genesis_event.Actor;
 import genesis_event.HandlerRelay;
 import genesis_util.HelpMath;

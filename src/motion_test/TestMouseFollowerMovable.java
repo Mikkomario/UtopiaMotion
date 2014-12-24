@@ -4,12 +4,12 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 
+import omega_util.SimpleGameObject;
+import omega_util.Transformation;
 import motion_movement.Movable;
 import motion_movement.ObjectMover;
 import motion_movement.ObjectRotator;
 import motion_movement.Rotateable;
-import exodus_object.SimpleGameObject;
-import exodus_util.Transformation;
 import genesis_event.Actor;
 import genesis_event.AdvancedMouseEvent;
 import genesis_event.AdvancedMouseListener;

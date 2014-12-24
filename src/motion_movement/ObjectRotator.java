@@ -1,7 +1,7 @@
 package motion_movement;
 
-import exodus_object.DependentGameObject;
-import exodus_util.Transformation;
+import omega_util.DependentGameObject;
+import omega_util.Transformation;
 import genesis_event.Actor;
 import genesis_event.HandlerRelay;
 
