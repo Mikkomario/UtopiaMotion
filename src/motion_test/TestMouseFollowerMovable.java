@@ -11,11 +11,11 @@ import motion_movement.ObjectMover;
 import motion_movement.ObjectRotator;
 import motion_movement.Rotateable;
 import genesis_event.Actor;
-import genesis_event.AdvancedMouseEvent;
-import genesis_event.AdvancedMouseListener;
 import genesis_event.Drawable;
 import genesis_event.EventSelector;
 import genesis_event.HandlerRelay;
+import genesis_event.MouseEvent;
+import genesis_event.MouseListener;
 import genesis_util.StateOperator;
 import genesis_util.Vector2D;
 
@@ -25,12 +25,12 @@ import genesis_util.Vector2D;
  * @since 22.12.2014
  */
 public class TestMouseFollowerMovable extends SimpleGameObject implements
-		Movable, AdvancedMouseListener, Actor, Drawable, Rotateable
+		Movable, MouseListener, Actor, Drawable, Rotateable
 {
 	// ATTRIBUTES	--------------------------
 	
 	private Transformation transformation;
-	private EventSelector<AdvancedMouseEvent> selector;
+	private EventSelector<MouseEvent> selector;
 	private ObjectMover mover;
 	private Vector2D lastMousePosition;
 	private ObjectRotator rotator;
@@ -47,7 +47,7 @@ public class TestMouseFollowerMovable extends SimpleGameObject implements
 		super(handlers);
 		
 		this.transformation = new Transformation();
-		this.selector = AdvancedMouseEvent.createMouseMoveSelector();
+		this.selector = MouseEvent.createMouseMoveSelector();
 		this.mover = new ObjectMover(this, handlers);
 		this.lastMousePosition = Vector2D.zeroVector();
 		this.rotator = new ObjectRotator(this, handlers);
@@ -75,7 +75,7 @@ public class TestMouseFollowerMovable extends SimpleGameObject implements
 	}
 
 	@Override
-	public EventSelector<AdvancedMouseEvent> getMouseEventSelector()
+	public EventSelector<MouseEvent> getMouseEventSelector()
 	{
 		return this.selector;
 	}
@@ -87,7 +87,7 @@ public class TestMouseFollowerMovable extends SimpleGameObject implements
 	}
 
 	@Override
-	public void onMouseEvent(AdvancedMouseEvent event)
+	public void onMouseEvent(MouseEvent event)
 	{
 		this.lastMousePosition = event.getPosition();
 	}
@@ -150,12 +150,6 @@ public class TestMouseFollowerMovable extends SimpleGameObject implements
 	public StateOperator getIsVisibleStateOperator()
 	{
 		return getIsActiveStateOperator();
-	}
-
-	@Override
-	public void setDepth(int depth)
-	{
-		// Not happening
 	}
 
 	@Override
