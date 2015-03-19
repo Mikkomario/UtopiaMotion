@@ -1,4 +1,4 @@
-package motion_movement;
+package motion_util;
 
 import genesis_util.Vector2D;
 

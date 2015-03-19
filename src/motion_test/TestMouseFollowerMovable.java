@@ -109,7 +109,8 @@ public class TestMouseFollowerMovable extends SimpleGameObject implements
 	{
 		//System.out.println(getTransformation().getPosition());
 		// Moves towards the mouse
-		if (getMover() != null && this.lastMousePosition != null && getTransformation() != null)
+		if (getMover() != null && this.lastMousePosition != null && 
+				getTransformation() != null && getRotator() != null)
 		{
 			getMover().applyForce(this.lastMousePosition.minus(
 					getTransformation().getPosition()).times(duration * 0.002));
@@ -118,7 +119,18 @@ public class TestMouseFollowerMovable extends SimpleGameObject implements
 			
 			// Stops if too far to the right
 			if (getTransformation().getPosition().getFirst() > 500)
-				getMover().negateDirectionalVelocity(new Vector2D(1, 0));
+			{
+				
+				Vector2D p = getMover().getMomentum(new Vector2D(1, 0));
+				Vector2D f = ObjectMover.getForceCausingMomentum(p, duration).reverse();
+				
+				getMover().applyFriction(0.6, duration, f.getLength(), new Vector2D(0, 1));
+				getMover().applyForce(f);
+				
+				setTrasformation(getTransformation().withPosition(new Vector2D(500, 
+						getTransformation().getPosition().getSecond())));
+				//getMover().negateDirectionalVelocity(new Vector2D(1, 0));
+			}
 			
 			// Changes the rotation speed
 			getRotator().increaseRotation(getMover().getVelocity().getLength() * 0.01);

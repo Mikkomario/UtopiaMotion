@@ -3,6 +3,7 @@ package motion_movement;
 import java.util.ArrayList;
 import java.util.List;
 
+import motion_util.Impulse;
 import omega_util.DependentGameObject;
 import omega_util.Transformation;
 import genesis_event.Actor;
@@ -85,7 +86,7 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 	// GETTERS & SETTERS	-------------------------
 	
 	/**
-	 * @return The velocity of the object
+	 * @return The velocity of the object. (Pxl / step)
 	 */
 	public Vector2D getVelocity()
 	{
@@ -93,7 +94,7 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 	}
 	
 	/**
-	 * @return The acceleration of the object
+	 * @return The acceleration of the object. (Pxl / step^2)
 	 */
 	public Vector2D getAcceleration()
 	{
@@ -109,17 +110,223 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 		this.velocity = v;
 	}
 	
+	/**
+	 * @return The object's current momentum. (Kg * pxl / step)
+	 */
+	public Vector2D getMomentum()
+	{
+		// P = m * v
+		return getVelocity().times(getMaster().getMass());
+	}
+	
+	/**
+	 * Calculates the object's current directional momentum
+	 * @param direction The direction of the momentum
+	 * @return How much momentum the object has towards the given direction
+	 */
+	public Vector2D getMomentum(Vector2D direction)
+	{
+		return getMomentum().vectorProjection(direction);
+	}
+	
+	/**
+	 * Changes the object's momentum
+	 * @param newMomentum The object's new momentum
+	 * @param duration How long the causing effect lasted
+	 */
+	public void setMomentum(Vector2D newMomentum, double duration)
+	{
+		// F = dP / dt
+		Vector2D force = (newMomentum.minus(getMomentum())).dividedBy(duration);
+		applyForce(force);
+	}
+	
+	/**
+	 * Changes the object's directional momentum. This only affects the object's movement on 
+	 * a single axis.
+	 * @param newMomentum The object's new directional momentum. 
+	 * @param duration How long the causing effect lasted
+	 */
+	public void setDirectionalMomentum(Vector2D newMomentum, double duration)
+	{
+		// Doesn't work with zero vectors
+		if (newMomentum.getLength() < 0.0001)
+			return;
+		
+		// F = dP / dt
+		Vector2D force = (newMomentum.minus(getMomentum(newMomentum))).dividedBy(duration);
+		applyForce(force);
+	}
+	
+	/**
+	 * Negates all of the object's directional momentum
+	 * @param axis The axis along which the momentum is negated
+	 * @param duration How long the causing effect lasted
+	 */
+	public void negateDirectionalMomentum(Vector2D axis, double duration)
+	{	
+		// F = dP / dt where dP = -P
+		Vector2D force = getMomentum(axis).dividedBy(-duration);
+		applyForce(force);
+	}
+	
 	
 	// OTHER METHODS	------------------------
 	
 	/**
+	 * Calculates the force necessary for causing the given momentum
+	 * @param momentum The momentum
+	 * @param duration The duration of the force
+	 * @return The force vector that causes the given momentum over the given duration
+	 */
+	public static Vector2D getForceCausingMomentum(Vector2D momentum, double duration)
+	{
+		// F = dP / dt
+		return momentum.dividedBy(duration);
+	}
+	
+	/**
+	 * Calculates the momentum the object will have after a collision with the given 
+	 * object
+	 * @param other The other object
+	 * @return The momentum this object will have after the collision
+	 */
+	public Vector2D getMomentumAfterCollisionWith(Movable other)
+	{
+		double m1 = getMaster().getMass();
+		double m2 = other.getMass();
+		Vector2D P2 = other.getMover().getMomentum();
+		
+		// P = (P1 * (m1 - m2) + 2 * P2 * m1) / (m1 + m2)
+		return (getMomentum().times(m1 - m2).plus(P2.times(2 * m1))).dividedBy(m1  + m2);
+	}
+	
+	/**
+	 * Calculates the directional momentum of the object after a collision with the given 
+	 * object
+	 * @param other The other object
+	 * @param axis The axis along which the collision happened.
+	 * @return The object's new directional momentum after a collision with another object
+	 */
+	public Vector2D getDirectionalMomentumAfterCollisionWith(Movable other, Vector2D axis)
+	{
+		return getMomentumAfterCollisionWith(other).vectorProjection(axis);
+	}
+	
+	/**
+	 * Changes the momentums of the two objects as if they had collided with each other
+	 * @param other The object that was collided with
+	 * @param collisionDuration How long the collision took place
+	 */
+	public void handleCollisionWith(Movable other, double collisionDuration)
+	{
+		Vector2D endMomentumThis = getMomentumAfterCollisionWith(other);
+		Vector2D endMomentumOther = other.getMover().getMomentumAfterCollisionWith(getMaster());
+		
+		setMomentum(endMomentumThis, collisionDuration);
+		other.getMover().setMomentum(endMomentumOther, collisionDuration);
+	}
+	
+	/**
+	 * Changes the momentums of the two objects as if they had collided with each other. This 
+	 * operation takes directional collisions.
+	 * @param other The object that was collided with
+	 * @param collisionDuration How long the collision took place
+	 * @param axis The axis along which the collision happened. A minimum translation vector 
+	 * can be used here, for example
+	 */
+	public void handleCollisionWith(Movable other, double collisionDuration, 
+			Vector2D axis)
+	{
+		Vector2D endMomentumThis = getDirectionalMomentumAfterCollisionWith(other, axis);
+		Vector2D endMomentumOther = 
+				other.getMover().getDirectionalMomentumAfterCollisionWith(getMaster(), axis);
+		
+		if (endMomentumThis.getLength() > 0.001)
+			setDirectionalMomentum(endMomentumThis, collisionDuration);
+		else
+			negateDirectionalMomentum(axis, collisionDuration);
+		
+		if (endMomentumOther.getLength() > 0.001)
+			other.getMover().setDirectionalMomentum(endMomentumOther, collisionDuration);
+		else
+			other.getMover().negateDirectionalMomentum(axis, collisionDuration);
+	}
+	
+	/**
 	 * Applies the given amount of force into the object
-	 * @param f The force vector applied to the object (in newtons or something like that)
+	 * @param f The force vector applied to the object (Kg * pxl)
 	 */
 	public void applyForce(Vector2D f)
 	{
 		// a += f / m
 		this.acceleration = this.acceleration.plus(f.dividedBy(getMaster().getMass()));
+	}
+	
+	/**
+	 * Applies friction to every direction based on the gravity. This should be used mostly in 
+	 * overhead perspectives
+	 * @param frictionModifier The friction modifier between the surfaces
+	 * @param duration The duration of the effect
+	 * @param gravityConstant The gravity constant that affects the force intensity (Kg * pxl)
+	 */
+	public void applyFriction(double frictionModifier, double duration, double gravityConstant)
+	{
+		// N = G = m * g
+		applyFriction(frictionModifier, duration, gravityConstant * getMaster().getMass(), 
+				getVelocity());
+	}
+	
+	/**
+	 * Applies friction along the given surface.
+	 * @param frictionModifier The friction modifier between the surfaces
+	 * @param duration The duration of the effect
+	 * @param supportForce How large is the force pushing the surfaces apart
+	 * @param surfaceAxis An axis parallel to the collision surface
+	 */
+	public void applyFriction(double frictionModifier, double duration, 
+			double supportForce, Vector2D surfaceAxis)
+	{
+		applyFriction(frictionModifier, duration, supportForce, surfaceAxis, 
+				Vector2D.zeroVector());
+	}
+	
+	/**
+	 * Applies friction along the given moving surface.
+	 * @param frictionModifier The friction modifier between the surfaces
+	 * @param duration The duration of the effect
+	 * @param supportForce How large is the force pushing the surfaces apart
+	 * @param surfaceAxis An axis parallel to the collision surface
+	 * @param surfaceVelocity The velocity of the surface
+	 */
+	public void applyFriction(double frictionModifier, double duration, 
+			double supportForce, Vector2D surfaceAxis, Vector2D surfaceVelocity)
+	{
+		Vector2D directionalVelocity = getVelocity().vectorProjection(surfaceAxis);
+		Vector2D directionalSurfaceVelocity = surfaceVelocity.vectorProjection(surfaceAxis);
+		Vector2D velocityDifference = directionalSurfaceVelocity.minus(directionalVelocity);
+		
+		// If the object isn't moving, doesn't apply friction
+		if (HelpMath.areApproximatelyEqual(velocityDifference.getLength(), 0))
+			return;
+		
+		// F = u * N
+		Vector2D f = velocityDifference.withLength(frictionModifier * supportForce);
+		// Fmax = dP / dt where dP = m * dv
+		Vector2D fMax = velocityDifference.times(getMaster().getMass()).dividedBy(duration);
+		
+		// The friction won't be changing the sign of the velocity
+		if (f.getLength() > fMax.getLength())
+		{
+			if (HelpMath.areApproximatelyEqual(surfaceVelocity.getLength(), 0))
+				negateDirectionalMomentum(surfaceAxis, duration);
+			// a = dv / dt
+			else
+				this.acceleration = getAcceleration().plus(velocityDifference.dividedBy(
+						duration));
+		}
+		else
+			applyForce(f);
 	}
 	
 	/**
