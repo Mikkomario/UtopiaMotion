@@ -89,7 +89,7 @@ public class TestPushDisk extends TestDisk implements Actor, MouseListener
 			if ( distance < getRadius() + disk.getRadius())
 			{
 				Vector2D mtv = getPosition().minus(disk.getPosition()).withLength(getRadius() + 
-						disk.getRadius() - distance + 1);
+						disk.getRadius() - distance);
 				
 				Transformable.transform(this, Transformation.transitionTransformation(mtv));
 				getMover().handleCollisionWith(disk, duration, mtv);

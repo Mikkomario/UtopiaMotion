@@ -169,4 +169,10 @@ public class TestMouseFollowerMovable extends SimpleGameObject implements
 	{
 		return this.rotator;
 	}
+
+	@Override
+	public double getDefaultMomentMass()
+	{
+		return Rotateable.getRectangleMomentMass(getMass(), 20, 20);
+	}
 }
