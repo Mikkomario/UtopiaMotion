@@ -9,7 +9,7 @@ import omega_util.Transformation;
 import genesis_event.Actor;
 import genesis_event.HandlerRelay;
 import genesis_util.HelpMath;
-import genesis_util.Vector2D;
+import genesis_util.Vector3D;
 
 /**
  * Object mover handles object movement by using velocity and accelration.
@@ -21,7 +21,7 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 {
 	// ATTRIBUTES	--------------------------
 	
-	private Vector2D acceleration, velocity, lastAcceleration;
+	private Vector3D acceleration, velocity, lastAcceleration;
 	private List<Impulse> impulses;
 	
 	
@@ -38,9 +38,9 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 		super(user, handlers);
 		
 		// Initializes attributes
-		this.acceleration = Vector2D.zeroVector();
-		this.velocity = Vector2D.zeroVector();
-		this.lastAcceleration = Vector2D.zeroVector();
+		this.acceleration = Vector3D.zeroVector();
+		this.velocity = Vector3D.zeroVector();
+		this.lastAcceleration = Vector3D.zeroVector();
 		this.impulses = new ArrayList<>();
 	}
 	
@@ -73,13 +73,13 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 				getVelocity().times(duration).plus(
 				this.lastAcceleration.times(0.5 * Math.pow(duration, 2))))));
 		// Adjusts the velocity
-		Vector2D averageAcceleration = 
+		Vector3D averageAcceleration = 
 				this.lastAcceleration.plus(getAcceleration()).dividedBy(2);
 		this.velocity = this.velocity.plus(averageAcceleration.times(duration));
 		
 		// Remembers the latest acceleration
 		this.lastAcceleration = getAcceleration();
-		this.acceleration = Vector2D.zeroVector();
+		this.acceleration = Vector3D.zeroVector();
 	}
 	
 	
@@ -88,7 +88,7 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 	/**
 	 * @return The velocity of the object. (Pxl / step)
 	 */
-	public Vector2D getVelocity()
+	public Vector3D getVelocity()
 	{
 		return this.velocity;
 	}
@@ -96,7 +96,7 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 	/**
 	 * @return The acceleration of the object. (Pxl / step^2)
 	 */
-	public Vector2D getAcceleration()
+	public Vector3D getAcceleration()
 	{
 		return this.acceleration;
 	}
@@ -105,7 +105,7 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 	 * Changes the object's velocity
 	 * @param v The object's new velocity
 	 */
-	public void setVelocity(Vector2D v)
+	public void setVelocity(Vector3D v)
 	{
 		this.velocity = v;
 	}
@@ -113,7 +113,7 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 	/**
 	 * @return The object's current momentum. (Kg * pxl / step)
 	 */
-	public Vector2D getMomentum()
+	public Vector3D getMomentum()
 	{
 		// P = m * v
 		return getVelocity().times(getMaster().getMass());
@@ -124,7 +124,7 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 	 * @param direction The direction of the momentum
 	 * @return How much momentum the object has towards the given direction
 	 */
-	public Vector2D getMomentum(Vector2D direction)
+	public Vector3D getMomentum(Vector3D direction)
 	{
 		return getMomentum().vectorProjection(direction);
 	}
@@ -134,10 +134,10 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 	 * @param newMomentum The object's new momentum
 	 * @param duration How long the causing effect lasted
 	 */
-	public void setMomentum(Vector2D newMomentum, double duration)
+	public void setMomentum(Vector3D newMomentum, double duration)
 	{
 		// F = dP / dt
-		Vector2D force = (newMomentum.minus(getMomentum())).dividedBy(duration);
+		Vector3D force = (newMomentum.minus(getMomentum())).dividedBy(duration);
 		applyForce(force);
 	}
 	
@@ -147,14 +147,14 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 	 * @param newMomentum The object's new directional momentum. 
 	 * @param duration How long the causing effect lasted
 	 */
-	public void setDirectionalMomentum(Vector2D newMomentum, double duration)
+	public void setDirectionalMomentum(Vector3D newMomentum, double duration)
 	{
 		// Doesn't work with zero vectors
 		if (newMomentum.getLength() < 0.0001)
 			return;
 		
 		// F = dP / dt
-		Vector2D force = (newMomentum.minus(getMomentum(newMomentum))).dividedBy(duration);
+		Vector3D force = (newMomentum.minus(getMomentum(newMomentum))).dividedBy(duration);
 		applyForce(force);
 	}
 	
@@ -163,10 +163,10 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 	 * @param axis The axis along which the momentum is negated
 	 * @param duration How long the causing effect lasted
 	 */
-	public void negateDirectionalMomentum(Vector2D axis, double duration)
+	public void negateDirectionalMomentum(Vector3D axis, double duration)
 	{	
 		// F = dP / dt where dP = -P
-		Vector2D force = getMomentum(axis).dividedBy(-duration);
+		Vector3D force = getMomentum(axis).dividedBy(-duration);
 		applyForce(force);
 	}
 	
@@ -179,7 +179,7 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 	 * @param duration The duration of the force
 	 * @return The force vector that causes the given momentum over the given duration
 	 */
-	public static Vector2D getForceCausingMomentum(Vector2D momentum, double duration)
+	public static Vector3D getForceCausingMomentum(Vector3D momentum, double duration)
 	{
 		// F = dP / dt
 		return momentum.dividedBy(duration);
@@ -191,11 +191,11 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 	 * @param other The other object
 	 * @return The momentum this object will have after the collision
 	 */
-	public Vector2D getMomentumAfterCollisionWith(Movable other)
+	public Vector3D getMomentumAfterCollisionWith(Movable other)
 	{
 		double m1 = getMaster().getMass();
 		double m2 = other.getMass();
-		Vector2D P2 = other.getMover().getMomentum();
+		Vector3D P2 = other.getMover().getMomentum();
 		
 		// P = (P1 * (m1 - m2) + 2 * P2 * m1) / (m1 + m2)
 		return (getMomentum().times(m1 - m2).plus(P2.times(2 * m1))).dividedBy(m1  + m2);
@@ -208,7 +208,7 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 	 * @param axis The axis along which the collision happened.
 	 * @return The object's new directional momentum after a collision with another object
 	 */
-	public Vector2D getDirectionalMomentumAfterCollisionWith(Movable other, Vector2D axis)
+	public Vector3D getDirectionalMomentumAfterCollisionWith(Movable other, Vector3D axis)
 	{
 		return getMomentumAfterCollisionWith(other).vectorProjection(axis);
 	}
@@ -220,8 +220,8 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 	 */
 	public void handleCollisionWith(Movable other, double collisionDuration)
 	{
-		Vector2D endMomentumThis = getMomentumAfterCollisionWith(other);
-		Vector2D endMomentumOther = other.getMover().getMomentumAfterCollisionWith(getMaster());
+		Vector3D endMomentumThis = getMomentumAfterCollisionWith(other);
+		Vector3D endMomentumOther = other.getMover().getMomentumAfterCollisionWith(getMaster());
 		
 		setMomentum(endMomentumThis, collisionDuration);
 		other.getMover().setMomentum(endMomentumOther, collisionDuration);
@@ -236,10 +236,10 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 	 * can be used here, for example
 	 */
 	public void handleCollisionWith(Movable other, double collisionDuration, 
-			Vector2D axis)
+			Vector3D axis)
 	{
-		Vector2D endMomentumThis = getDirectionalMomentumAfterCollisionWith(other, axis);
-		Vector2D endMomentumOther = 
+		Vector3D endMomentumThis = getDirectionalMomentumAfterCollisionWith(other, axis);
+		Vector3D endMomentumOther = 
 				other.getMover().getDirectionalMomentumAfterCollisionWith(getMaster(), axis);
 		
 		if (endMomentumThis.getLength() > 0.001)
@@ -257,7 +257,7 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 	 * Applies the given amount of force into the object
 	 * @param f The force vector applied to the object (Kg * pxl)
 	 */
-	public void applyForce(Vector2D f)
+	public void applyForce(Vector3D f)
 	{
 		// a += f / m
 		this.acceleration = this.acceleration.plus(f.dividedBy(getMaster().getMass()));
@@ -285,10 +285,10 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 	 * @param surfaceAxis An axis parallel to the collision surface
 	 */
 	public void applyFriction(double frictionModifier, double duration, 
-			double supportForce, Vector2D surfaceAxis)
+			double supportForce, Vector3D surfaceAxis)
 	{
 		applyFriction(frictionModifier, duration, supportForce, surfaceAxis, 
-				Vector2D.zeroVector());
+				Vector3D.zeroVector());
 	}
 	
 	/**
@@ -300,20 +300,20 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 	 * @param surfaceVelocity The velocity of the surface
 	 */
 	public void applyFriction(double frictionModifier, double duration, 
-			double supportForce, Vector2D surfaceAxis, Vector2D surfaceVelocity)
+			double supportForce, Vector3D surfaceAxis, Vector3D surfaceVelocity)
 	{
-		Vector2D directionalVelocity = getVelocity().vectorProjection(surfaceAxis);
-		Vector2D directionalSurfaceVelocity = surfaceVelocity.vectorProjection(surfaceAxis);
-		Vector2D velocityDifference = directionalSurfaceVelocity.minus(directionalVelocity);
+		Vector3D directionalVelocity = getVelocity().vectorProjection(surfaceAxis);
+		Vector3D directionalSurfaceVelocity = surfaceVelocity.vectorProjection(surfaceAxis);
+		Vector3D velocityDifference = directionalSurfaceVelocity.minus(directionalVelocity);
 		
 		// If the object isn't moving, doesn't apply friction
 		if (HelpMath.areApproximatelyEqual(velocityDifference.getLength(), 0))
 			return;
 		
 		// F = u * N
-		Vector2D f = velocityDifference.withLength(frictionModifier * supportForce);
+		Vector3D f = velocityDifference.withLength(frictionModifier * supportForce);
 		// Fmax = dP / dt where dP = m * dv
-		Vector2D fMax = velocityDifference.times(getMaster().getMass()).dividedBy(duration);
+		Vector3D fMax = velocityDifference.times(getMaster().getMass()).dividedBy(duration);
 		
 		// The friction won't be changing the sign of the velocity
 		if (f.getLength() > fMax.getLength())
@@ -351,9 +351,9 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 	 * @param v The new directional movement of the object. Will only affect velocity parallel 
 	 * to the given vector.
 	 */
-	public void setDirectionalVelocity(Vector2D v)
+	public void setDirectionalVelocity(Vector3D v)
 	{
-		Vector2D directionalVelocity = getVelocity().vectorProjection(v);
+		Vector3D directionalVelocity = getVelocity().vectorProjection(v);
 		setVelocity(getVelocity().plus(v.minus(directionalVelocity)));
 	}
 	
@@ -361,12 +361,12 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 	 * Stops the object along the given axis
 	 * @param direction The axis on which the object is stopped
 	 */
-	public void negateDirectionalVelocity(Vector2D direction)
+	public void negateDirectionalVelocity(Vector3D direction)
 	{
-		Vector2D directionalVelocity = getVelocity().vectorProjection(direction);
+		Vector3D directionalVelocity = getVelocity().vectorProjection(direction);
 		// Only negates the velocity if it is towards the given direction
-		if (HelpMath.getAngleDifference180(direction.getDirection(), 
-				directionalVelocity.getDirection()) < 90)
+		if (HelpMath.getAngleDifference180(direction.getZDirection(), 
+				directionalVelocity.getZDirection()) < 90)
 			setVelocity(getVelocity().minus(directionalVelocity));
 	}
 	
@@ -376,6 +376,6 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 	 */
 	public void negateDirectionalVelocity(double direction)
 	{
-		negateDirectionalVelocity(Vector2D.unitVector(direction));
+		negateDirectionalVelocity(Vector3D.unitVector(direction));
 	}
 }

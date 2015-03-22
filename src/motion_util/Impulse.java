@@ -1,6 +1,6 @@
 package motion_util;
 
-import genesis_util.Vector2D;
+import genesis_util.Vector3D;
 
 /**
  * Impulses are forces that have a certain duration and can affect objects over time. The 
@@ -13,7 +13,7 @@ public class Impulse
 {
 	// ATTRIBUTES	----------------------------
 	
-	private Vector2D force;
+	private Vector3D force;
 	private double duration;
 	
 	
@@ -25,7 +25,7 @@ public class Impulse
 	 * @param force The force vector of the impulse
 	 * @param duration The duration of the impluse's effect
 	 */
-	public Impulse(Vector2D force, double duration)
+	public Impulse(Vector3D force, double duration)
 	{
 		// Initializes attribtes
 		this.force = force;
@@ -38,7 +38,7 @@ public class Impulse
 	/**
 	 * @return The amount of force applied each step
 	 */
-	public Vector2D getForceVector()
+	public Vector3D getForceVector()
 	{
 		return this.force;
 	}
@@ -59,7 +59,7 @@ public class Impulse
 	 * @param t How long is the time the force is applied / generated (in steps)
 	 * @return The amount of force applied over the given period of time.
 	 */
-	public Vector2D getForceOverTime(double t)
+	public Vector3D getForceOverTime(double t)
 	{
 		if (getDuration() > t)
 			return getForceVector().times(t);

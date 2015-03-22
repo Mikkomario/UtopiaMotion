@@ -1,7 +1,7 @@
 package motion_test;
 
 import genesis_event.HandlerRelay;
-import genesis_util.Vector2D;
+import genesis_util.Vector3D;
 import genesis_video.GamePanel;
 import genesis_video.GameWindow;
 
@@ -28,7 +28,7 @@ public class MotionStickTest
 	 */
 	public static void main(String[] args)
 	{
-		GameWindow window = new GameWindow(new Vector2D(800, 600), "Motion test 3", true, 
+		GameWindow window = new GameWindow(new Vector3D(800, 600), "Motion test 3", true, 
 				120, 20);
 		GamePanel panel = window.getMainPanel().addGamePanel();
 		

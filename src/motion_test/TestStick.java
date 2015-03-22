@@ -13,7 +13,7 @@ import genesis_event.MouseEvent.MouseButtonEventType;
 import genesis_event.MouseListener;
 import genesis_event.StrictEventSelector;
 import genesis_util.StateOperator;
-import genesis_util.Vector2D;
+import genesis_util.Vector3D;
 import motion_movement.ObjectRotator;
 import motion_movement.Rotateable;
 import omega_util.SimpleGameObject;
@@ -32,7 +32,7 @@ public class TestStick extends SimpleGameObject implements Rotateable, Drawable,
 	private Transformation transformation;
 	private ObjectRotator rotator;
 	private StrictEventSelector<MouseEvent, MouseEvent.Feature> selector;
-	private Vector2D lastMousePosition, lastEffectPosition;
+	private Vector3D lastMousePosition, lastEffectPosition;
 	
 	
 	// CONSTRUCTOR	------------------------------
@@ -46,12 +46,12 @@ public class TestStick extends SimpleGameObject implements Rotateable, Drawable,
 		super(handlers);
 		
 		this.length = 200;
-		this.transformation = new Transformation(new Vector2D(400, 300));
+		this.transformation = new Transformation(new Vector3D(400, 300));
 		this.rotator = new ObjectRotator(this, handlers);
 		this.selector = MouseEvent.createButtonEventSelector();
 		this.selector.addRequiredFeature(MouseButtonEventType.PRESSED);
-		this.lastEffectPosition = Vector2D.zeroVector();
-		this.lastMousePosition = Vector2D.zeroVector();
+		this.lastEffectPosition = Vector3D.zeroVector();
+		this.lastMousePosition = Vector3D.zeroVector();
 	}
 	
 	
@@ -100,7 +100,7 @@ public class TestStick extends SimpleGameObject implements Rotateable, Drawable,
 	}
 
 	@Override
-	public boolean isInAreaOfInterest(Vector2D position)
+	public boolean isInAreaOfInterest(Vector3D position)
 	{
 		return false;
 	}
@@ -112,16 +112,16 @@ public class TestStick extends SimpleGameObject implements Rotateable, Drawable,
 		// On right mouse click, changes the rotation axis
 		
 		// Adds moment to the stick, depending from the mouse position
-		Vector2D relativePosition = getTransformation().inverseTransform(e.getPosition());
+		Vector3D relativePosition = getTransformation().inverseTransform(e.getPosition());
 		
 		if (relativePosition.getSecond() < - this.length / 2 || relativePosition.getSecond() > this.length / 2)
 			return;
 		
-		Vector2D effectPosition = relativePosition.vectorProjection(new Vector2D(0, 1));
+		Vector3D effectPosition = relativePosition.vectorProjection(new Vector3D(0, 1));
 		
 		if (e.getButton() == MouseButton.LEFT)
 		{
-			Vector2D force = new Vector2D(50, 0);
+			Vector3D force = new Vector3D(50, 0);
 			if (relativePosition.getFirst() > 0)
 				force = force.reverse();
 			
@@ -130,10 +130,10 @@ public class TestStick extends SimpleGameObject implements Rotateable, Drawable,
 		}
 		else if (e.getButton() == MouseButton.RIGHT)
 		{
-			//if (getRotator().getRotationOrigin().equals(Vector2D.zeroVector()))
+			//if (getRotator().getRotationOrigin().equals(Vector3D.zeroVector()))
 			getRotator().setRotationOrigin(effectPosition);
 			//else
-			//	getRotator().setRotationOrigin(Vector2D.zeroVector());
+			//	getRotator().setRotationOrigin(Vector3D.zeroVector());
 		}
 		
 		this.lastMousePosition = relativePosition;

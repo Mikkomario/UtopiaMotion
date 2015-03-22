@@ -5,7 +5,7 @@ import omega_util.Transformable;
 import omega_util.Transformation;
 import genesis_event.Actor;
 import genesis_event.HandlerRelay;
-import genesis_util.Vector2D;
+import genesis_util.Vector3D;
 
 /**
  * ObjectRotator handles object rotation.
@@ -18,7 +18,7 @@ public class ObjectRotator extends DependentGameObject<Rotateable> implements Ac
 	// ATTRIBUTES	-------------------------
 	
 	private double rotation, acceleration, lastAcceleration, currentMomentMass;
-	private Vector2D rotationOrigin;
+	private Vector3D rotationOrigin;
 	private boolean rotationOriginAtDefault;
 	
 	
@@ -37,7 +37,7 @@ public class ObjectRotator extends DependentGameObject<Rotateable> implements Ac
 		this.rotation = 0;
 		this.acceleration = 0;
 		this.lastAcceleration = 0;
-		this.rotationOrigin = Vector2D.zeroVector();
+		this.rotationOrigin = Vector3D.zeroVector();
 		this.currentMomentMass = getMaster().getDefaultMomentMass();
 		this.rotationOriginAtDefault = true;
 	}
@@ -93,7 +93,7 @@ public class ObjectRotator extends DependentGameObject<Rotateable> implements Ac
 	/**
 	 * @return The relative coordinates around which the object rotates
 	 */
-	public Vector2D getRotationOrigin()
+	public Vector3D getRotationOrigin()
 	{
 		return this.rotationOrigin;
 	}
@@ -123,9 +123,9 @@ public class ObjectRotator extends DependentGameObject<Rotateable> implements Ac
 	 * @param relativeForce The force vector causing the moment. In relative object space.
 	 * @param relativeEffectPoint The relative point where the force is applied to
 	 */
-	public void applyMoment(Vector2D relativeForce, Vector2D relativeEffectPoint)
+	public void applyMoment(Vector3D relativeForce, Vector3D relativeEffectPoint)
 	{
-		Vector2D r = relativeEffectPoint.minus(getRotationOrigin());
+		Vector3D r = relativeEffectPoint.minus(getRotationOrigin());
 		// M = r x f
 		double M = r.crossProductLength(relativeForce);
 		
@@ -151,7 +151,7 @@ public class ObjectRotator extends DependentGameObject<Rotateable> implements Ac
 	 * Changes the rotation origin of the object. The default rotation origin is (0, 0)
 	 * @param newOrigin The new rotation origin (relative point)
 	 */
-	public void setRotationOrigin(Vector2D newOrigin)
+	public void setRotationOrigin(Vector3D newOrigin)
 	{
 		if (newOrigin.equals(getRotationOrigin()))
 			return;
@@ -159,7 +159,7 @@ public class ObjectRotator extends DependentGameObject<Rotateable> implements Ac
 		double oldMomentMass = getCurrentMomentMass();
 		
 		// Changes the moment mass of the object
-		if (newOrigin.equals(Vector2D.zeroVector()))
+		if (newOrigin.equals(Vector3D.zeroVector()))
 		{
 			this.currentMomentMass = getMaster().getDefaultMomentMass();
 			this.rotationOriginAtDefault = true;
@@ -205,5 +205,56 @@ public class ObjectRotator extends DependentGameObject<Rotateable> implements Ac
 			setRotation(getRotation() - decrease);
 		else
 			setRotation(getRotation() + decrease);
+	}
+	
+	/**
+	 * Calculates the impulse that should be applied to both of the given bodies upon collision
+	 * @param body1 The primary colliding object
+	 * @param body2 The secondary colliding object
+	 * @param v1 The velocity of the primary object
+	 * @param v2 The velocity of the secondary object
+	 * @param efficiencyCoefficient How efficient the collision is [0, 1]
+	 * @param mtv1 The minimal translation vector for the primary object
+	 * @param absoluteContactPoint The collision point
+	 * @return The impulse that should be applied to the primary object. The secondary object 
+	 * should be affected by impulse.reverse()
+	 */
+	public static Vector3D getCollisionImpulse(Rotateable body1, 
+			Rotateable body2, Vector3D v1, Vector3D v2, double efficiencyCoefficient, 
+			Vector3D mtv1, Vector3D absoluteContactPoint)
+	{
+		// ir = -(1 + e) * vr.dot(n) / 
+		// (m1^-1 + m2^-1 + (J1^-1 * (r1 x n) x r1 + J2^-1 * (r2 x n) x r2).dot(n))
+		// Where e = efficiencyCoefficient
+		// And n = mtv.reverse
+		// And vr is the speed difference between the pixels in the objects
+		// Body 1 is affected by -jr and that is returned
+		
+		Vector3D n = mtv1.reverse().normalized();
+		double m1Inverse = Math.pow(body1.getMass(), -1);
+		double m2Inverse = Math.pow(body2.getMass(), -1);
+		double J1Inverse = Math.pow(body1.getRotator().getCurrentMomentMass(), -1);
+		double J2Inverse = Math.pow(body2.getRotator().getCurrentMomentMass(), -1);
+		
+		Vector3D r1 = absoluteContactPoint.minus(body1.getTransformation().getPosition());
+		Vector3D r2 = absoluteContactPoint.minus(body2.getTransformation().getPosition());
+	
+		// vp = v + vw
+		Vector3D pointVelocity1 = v1.plus(getRailVelocity(r1, body1.getRotator().getRotation()));
+		Vector3D pointVelocity2 = v2.plus(getRailVelocity(r2, body2.getRotator().getRotation()));
+		//vr = vp1 - vp2 // TODO: Or is it vp2 - vp1?
+		Vector3D vr = pointVelocity1.minus(pointVelocity2);
+		
+		double jrLength = -(1 + efficiencyCoefficient) * vr.dotProduct(n) / 
+				(m1Inverse + m2Inverse + 
+				r1.crossProduct(n).times(J1Inverse).crossProduct(r1).plus(
+				r2.crossProduct(n).times(J2Inverse).crossProduct(r2)).crossProductLength(n));
+		return mtv1.withLength(Math.abs(jrLength));
+	}
+	
+	private static Vector3D getRailVelocity(Vector3D r, double rotationSpeed)
+	{
+		// v = r * w
+		return r.times(rotationSpeed).withZDirection(r.getZDirection() + 90);
 	}
 }

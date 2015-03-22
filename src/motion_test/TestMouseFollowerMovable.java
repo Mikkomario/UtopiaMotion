@@ -17,7 +17,7 @@ import genesis_event.HandlerRelay;
 import genesis_event.MouseEvent;
 import genesis_event.MouseListener;
 import genesis_util.StateOperator;
-import genesis_util.Vector2D;
+import genesis_util.Vector3D;
 
 /**
  * This object moves towards the mouse but stops after a certain point to the right
@@ -32,7 +32,7 @@ public class TestMouseFollowerMovable extends SimpleGameObject implements
 	private Transformation transformation;
 	private EventSelector<MouseEvent> selector;
 	private ObjectMover mover;
-	private Vector2D lastMousePosition;
+	private Vector3D lastMousePosition;
 	private ObjectRotator rotator;
 	
 	
@@ -49,7 +49,7 @@ public class TestMouseFollowerMovable extends SimpleGameObject implements
 		this.transformation = new Transformation();
 		this.selector = MouseEvent.createMouseMoveSelector();
 		this.mover = new ObjectMover(this, handlers);
-		this.lastMousePosition = Vector2D.zeroVector();
+		this.lastMousePosition = Vector3D.zeroVector();
 		this.rotator = new ObjectRotator(this, handlers);
 	}
 	
@@ -81,7 +81,7 @@ public class TestMouseFollowerMovable extends SimpleGameObject implements
 	}
 
 	@Override
-	public boolean isInAreaOfInterest(Vector2D position)
+	public boolean isInAreaOfInterest(Vector3D position)
 	{
 		return false;
 	}
@@ -115,21 +115,21 @@ public class TestMouseFollowerMovable extends SimpleGameObject implements
 			getMover().applyForce(this.lastMousePosition.minus(
 					getTransformation().getPosition()).times(duration * 0.002));
 		
-			getMover().applyForce(new Vector2D(0, duration * 0.01));
+			getMover().applyForce(new Vector3D(0, duration * 0.01));
 			
 			// Stops if too far to the right
 			if (getTransformation().getPosition().getFirst() > 500)
 			{
 				
-				Vector2D p = getMover().getMomentum(new Vector2D(1, 0));
-				Vector2D f = ObjectMover.getForceCausingMomentum(p, duration).reverse();
+				Vector3D p = getMover().getMomentum(new Vector3D(1, 0));
+				Vector3D f = ObjectMover.getForceCausingMomentum(p, duration).reverse();
 				
-				getMover().applyFriction(0.6, duration, f.getLength(), new Vector2D(0, 1));
+				getMover().applyFriction(0.6, duration, f.getLength(), new Vector3D(0, 1));
 				getMover().applyForce(f);
 				
-				setTrasformation(getTransformation().withPosition(new Vector2D(500, 
+				setTrasformation(getTransformation().withPosition(new Vector3D(500, 
 						getTransformation().getPosition().getSecond())));
-				//getMover().negateDirectionalVelocity(new Vector2D(1, 0));
+				//getMover().negateDirectionalVelocity(new Vector3D(1, 0));
 			}
 			
 			// Changes the rotation speed

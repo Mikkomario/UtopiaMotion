@@ -8,7 +8,7 @@ import genesis_event.Actor;
 import genesis_event.Drawable;
 import genesis_event.HandlerRelay;
 import genesis_util.StateOperator;
-import genesis_util.Vector2D;
+import genesis_util.Vector3D;
 import motion_movement.Movable;
 import motion_movement.ObjectMover;
 import omega_util.SimpleGameObject;
@@ -28,7 +28,7 @@ public class TestDisk extends SimpleGameObject implements Movable, Drawable, Act
 	private Transformation t;
 	private int radius;
 	private ObjectMover mover;
-	private Vector2D windowSize;
+	private Vector3D windowSize;
 	
 	
 	// CONSTRUCTOR	-----------------------
@@ -41,8 +41,8 @@ public class TestDisk extends SimpleGameObject implements Movable, Drawable, Act
 	 * @param radius The radius of the disk
 	 * @param windowSize The size of the program window
 	 */
-	public TestDisk(HandlerRelay handlers, Color color, Vector2D position, int radius, 
-			Vector2D windowSize)
+	public TestDisk(HandlerRelay handlers, Color color, Vector3D position, int radius, 
+			Vector3D windowSize)
 	{
 		super(handlers);
 		
@@ -115,13 +115,13 @@ public class TestDisk extends SimpleGameObject implements Movable, Drawable, Act
 		
 		// The disks cannot go outside the window boundaries
 		if (getPosition().getFirst() < 0)
-			getMover().setDirectionalVelocity(new Vector2D(Math.abs(getMover().getVelocity().getFirst()), 0));
+			getMover().setDirectionalVelocity(new Vector3D(Math.abs(getMover().getVelocity().getFirst()), 0));
 		if (getPosition().getSecond() < 0)
-			getMover().setDirectionalVelocity(new Vector2D(0, Math.abs(getMover().getVelocity().getSecond())));
+			getMover().setDirectionalVelocity(new Vector3D(0, Math.abs(getMover().getVelocity().getSecond())));
 		if (getPosition().getFirst() > this.windowSize.getFirst())
-			getMover().setDirectionalVelocity(new Vector2D(-Math.abs(getMover().getVelocity().getFirst()), 0));
+			getMover().setDirectionalVelocity(new Vector3D(-Math.abs(getMover().getVelocity().getFirst()), 0));
 		if (getPosition().getSecond() > this.windowSize.getSecond())
-			getMover().setDirectionalVelocity(new Vector2D(0, -Math.abs(getMover().getVelocity().getSecond())));
+			getMover().setDirectionalVelocity(new Vector3D(0, -Math.abs(getMover().getVelocity().getSecond())));
 		
 		// Also calculates friction
 		getMover().applyFriction(0.3, duration, 0.098);
@@ -141,7 +141,7 @@ public class TestDisk extends SimpleGameObject implements Movable, Drawable, Act
 	/**
 	 * @return The position of the disk's origin
 	 */
-	public Vector2D getPosition()
+	public Vector3D getPosition()
 	{
 		return getTransformation().getPosition();
 	}

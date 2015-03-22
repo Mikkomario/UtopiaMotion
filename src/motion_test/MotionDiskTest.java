@@ -8,7 +8,7 @@ import genesis_event.ActorHandler;
 import genesis_event.DrawableHandler;
 import genesis_event.HandlerRelay;
 import genesis_event.MouseListenerHandler;
-import genesis_util.Vector2D;
+import genesis_util.Vector3D;
 import genesis_video.GamePanel;
 import genesis_video.GameWindow;
 
@@ -35,7 +35,7 @@ public class MotionDiskTest
 	 */
 	public static void main(String[] args)
 	{
-		Vector2D windowSize = new Vector2D(500, 500);
+		Vector3D windowSize = new Vector3D(500, 500);
 		
 		GameWindow window = new GameWindow(windowSize, "Motion Test 2", true, 120, 20);
 		GamePanel panel = window.getMainPanel().addGamePanel();
@@ -46,9 +46,9 @@ public class MotionDiskTest
 		handlers.addHandler(new MouseListenerHandler(false, window.getHandlerRelay()));
 		
 		List<TestDisk> disks = new ArrayList<>();
-		disks.add(new TestDisk(handlers, Color.BLACK, new Vector2D(100, 200), 10, windowSize));
-		disks.add(new TestDisk(handlers, Color.BLACK, new Vector2D(400, 400), 30, windowSize));
-		disks.add(new TestDisk(handlers, Color.BLACK, new Vector2D(100, 400), 50, windowSize));
+		disks.add(new TestDisk(handlers, Color.BLACK, new Vector3D(100, 200), 10, windowSize));
+		disks.add(new TestDisk(handlers, Color.BLACK, new Vector3D(400, 400), 30, windowSize));
+		disks.add(new TestDisk(handlers, Color.BLACK, new Vector3D(100, 400), 50, windowSize));
 		
 		new TestPushDisk(handlers, windowSize.dividedBy(2), windowSize, disks);
 	}

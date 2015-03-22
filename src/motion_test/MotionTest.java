@@ -5,7 +5,7 @@ import genesis_event.ActorHandler;
 import genesis_event.DrawableHandler;
 import genesis_event.HandlerRelay;
 import genesis_event.MouseListenerHandler;
-import genesis_util.Vector2D;
+import genesis_util.Vector3D;
 import genesis_video.GamePanel;
 import genesis_video.GameWindow;
 
@@ -33,7 +33,7 @@ public class MotionTest
 	public static void main(String[] args)
 	{
 		// Creates the window & panel
-		GameWindow window = new GameWindow(new Vector2D(800, 600), "Motion test", true, 
+		GameWindow window = new GameWindow(new Vector3D(800, 600), "Motion test", true, 
 				120, 20);
 		GamePanel panel = window.getMainPanel().addGamePanel();
 		
@@ -45,6 +45,6 @@ public class MotionTest
 		
 		// Creates the test object(s)
 		new TestMouseFollowerMovable(handlers).setTrasformation(
-				Transformation.transitionTransformation(new Vector2D(400, 300)));
+				Transformation.transitionTransformation(new Vector3D(400, 300)));
 	}
 }

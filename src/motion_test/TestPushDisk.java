@@ -15,7 +15,7 @@ import genesis_event.MouseListener;
 import genesis_event.StrictEventSelector;
 import genesis_util.HelpMath;
 import genesis_util.StateOperator;
-import genesis_util.Vector2D;
+import genesis_util.Vector3D;
 
 /**
  * This is a special disk that reacts to the mouse and is able to push other disks around
@@ -39,7 +39,7 @@ public class TestPushDisk extends TestDisk implements Actor, MouseListener
 	 * @param windowSize The size of the program window
 	 * @param otherDisks A list that contains the disks this one can collide with
 	 */
-	public TestPushDisk(HandlerRelay handlers, Vector2D position, Vector2D windowSize, 
+	public TestPushDisk(HandlerRelay handlers, Vector3D position, Vector3D windowSize, 
 			List<TestDisk> otherDisks)
 	{
 		super(handlers, Color.RED, position, 30, windowSize);
@@ -68,9 +68,9 @@ public class TestPushDisk extends TestDisk implements Actor, MouseListener
 	}
 
 	@Override
-	public boolean isInAreaOfInterest(Vector2D position)
+	public boolean isInAreaOfInterest(Vector3D position)
 	{
-		return HelpMath.pointDistance(position, getPosition()) < getRadius();
+		return HelpMath.pointDistance2D(position, getPosition()) < getRadius();
 	}
 
 	@Override
@@ -85,10 +85,10 @@ public class TestPushDisk extends TestDisk implements Actor, MouseListener
 		// Checks for collisions with the other disks
 		for (TestDisk disk : this.disks)
 		{
-			double distance = HelpMath.pointDistance(getPosition(), disk.getPosition());
+			double distance = HelpMath.pointDistance2D(getPosition(), disk.getPosition());
 			if ( distance < getRadius() + disk.getRadius())
 			{
-				Vector2D mtv = getPosition().minus(disk.getPosition()).withLength(getRadius() + 
+				Vector3D mtv = getPosition().minus(disk.getPosition()).withLength(getRadius() + 
 						disk.getRadius() - distance);
 				
 				Transformable.transform(this, Transformation.transitionTransformation(mtv));
