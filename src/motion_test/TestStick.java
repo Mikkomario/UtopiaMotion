@@ -130,6 +130,10 @@ public class TestStick extends SimpleGameObject implements Rotateable, Drawable,
 	@Override
 	public void drawSelf(Graphics2D g2d)
 	{
+		if (getTransformation() == null || this.lastMousePosition == null || 
+				this.lastEffectPosition == null)
+			return;
+		
 		g2d.setColor(Color.GREEN);
 		AffineTransform lastTransform = g2d.getTransform();
 		getTransformation().transform(g2d);

@@ -129,7 +129,8 @@ public class ObjectRotator extends DependentGameObject<Rotateable> implements Ac
 		// M = r x f
 		double M = r.crossProductLength(relativeForce);
 		
-		// Checks if the moment should be negative
+		// Checks if the moment should be negative (Removed at genesis 1.271)
+		/*
 		double forceDir = relativeForce.getDirection();
 		double rDir = r.reverse().getDirection();
 		
@@ -140,6 +141,7 @@ public class ObjectRotator extends DependentGameObject<Rotateable> implements Ac
 		}
 		else if (forceDir < rDir)
 			M = -M;
+		*/
 		
 		// a += M / J
 		increaseRotation(M / getCurrentMomentMass());
