@@ -48,7 +48,7 @@ public class TestStick extends SimpleGameObject implements Rotateable, Drawable,
 		this.length = 200;
 		this.transformation = new Transformation(new Vector2D(400, 300));
 		this.rotator = new ObjectRotator(this, handlers);
-		this.selector = MouseEvent.createMouseButtonSelector(MouseButton.LEFT);
+		this.selector = MouseEvent.createButtonEventSelector();
 		this.selector.addRequiredFeature(MouseButtonEventType.PRESSED);
 		this.lastEffectPosition = Vector2D.zeroVector();
 		this.lastMousePosition = Vector2D.zeroVector();
@@ -108,6 +108,9 @@ public class TestStick extends SimpleGameObject implements Rotateable, Drawable,
 	@Override
 	public void onMouseEvent(MouseEvent e)
 	{
+		// On left mouse click, adds moment
+		// On right mouse click, changes the rotation axis
+		
 		// Adds moment to the stick, depending from the mouse position
 		Vector2D relativePosition = getTransformation().inverseTransform(e.getPosition());
 		
@@ -115,16 +118,25 @@ public class TestStick extends SimpleGameObject implements Rotateable, Drawable,
 			return;
 		
 		Vector2D effectPosition = relativePosition.vectorProjection(new Vector2D(0, 1));
-		Vector2D force = new Vector2D(50, 0);
-		if (relativePosition.getFirst() > 0)
-			force = force.reverse();
 		
-		System.out.println(force.crossProductLength(effectPosition));
-		
-		getRotator().applyMoment(force, relativePosition);
+		if (e.getButton() == MouseButton.LEFT)
+		{
+			Vector2D force = new Vector2D(50, 0);
+			if (relativePosition.getFirst() > 0)
+				force = force.reverse();
+			
+			getRotator().applyMoment(force, relativePosition);
+			this.lastEffectPosition = effectPosition;
+		}
+		else if (e.getButton() == MouseButton.RIGHT)
+		{
+			//if (getRotator().getRotationOrigin().equals(Vector2D.zeroVector()))
+			getRotator().setRotationOrigin(effectPosition);
+			//else
+			//	getRotator().setRotationOrigin(Vector2D.zeroVector());
+		}
 		
 		this.lastMousePosition = relativePosition;
-		this.lastEffectPosition = effectPosition;
 	}
 
 	@Override
@@ -144,6 +156,9 @@ public class TestStick extends SimpleGameObject implements Rotateable, Drawable,
 				this.lastMousePosition.getSecondInt() - 2, 4, 4);
 		g2d.drawOval(this.lastEffectPosition.getFirstInt() - 2, 
 				this.lastEffectPosition.getSecondInt() - 2, 4, 4);
+		g2d.setColor(Color.BLUE);
+		g2d.drawOval(getRotator().getRotationOrigin().getFirstInt() - 3, 
+				getRotator().getRotationOrigin().getSecondInt() - 3, 6, 6);
 		
 		g2d.setTransform(lastTransform);
 	}

@@ -166,14 +166,10 @@ public class ObjectRotator extends DependentGameObject<Rotateable> implements Ac
 		}
 		else
 		{
-			// May need to change the origin to (0, 0) first
-			if (!this.rotationOriginAtDefault)
-				setRotationOrigin(Vector2D.zeroVector());
-			
 			// Ja = J0 + m * d^2
 			double d = newOrigin.getLength();
-			this.currentMomentMass = getCurrentMomentMass() + getMaster().getMass() * 
-					Math.pow(d, 2);
+			this.currentMomentMass = getMaster().getDefaultMomentMass() + 
+					getMaster().getMass() * Math.pow(d, 2);
 			this.rotationOriginAtDefault = false;
 		}
 		
