@@ -178,12 +178,31 @@ public class TestPhysicObject extends SimpleGameObject implements Movable,
 		{
 			TestPhysicObject target = (TestPhysicObject) event.getTarget();
 			Vector3D collisionPoint = HelpMath.getAveragePoint(event.getCollisionPoints());
+			
 			Vector3D impulse = ObjectRotator.getCollisionImpulse(this, target, 
-					getMover().getVelocity(), target.getMover().getVelocity(), 0.001, 
+					getMover().getVelocity(), target.getMover().getVelocity(), 0, 
 					event.getMTV(), collisionPoint);
-			applyForce(impulse, collisionPoint);
-			target.applyForce(impulse.reverse(), collisionPoint);
-			Transformable.transform(this, Transformation.transitionTransformation(event.getMTV()));
+			Vector3D force = impulse;//.dividedBy(event.getDuration());
+					
+			//System.out.println(event.getDuration());
+			//System.out.println(getMover().getVelocity().getLength() + target.getMover().getVelocity().getLength());
+			
+			applyForce(force, collisionPoint);
+			target.applyForce(force.reverse(), collisionPoint);
+			//getMover().handleCollisionWith(target, event.getDuration(), event.getMTV());
+			Transformable.transform(this, Transformation.transitionTransformation(event.getMTV().plus(1)));
+		}
+		else if (event.getTarget() instanceof TestWall)
+		{
+			Vector3D collisionPoint = HelpMath.getAveragePoint(event.getCollisionPoints());
+			
+			Vector3D impulse = ObjectRotator.getCollisionImpulse(this, 
+					getMover().getVelocity(), 0, event.getMTV(), collisionPoint);
+			Vector3D force = impulse;//.dividedBy(event.getDuration());
+			
+			applyForce(force, collisionPoint);
+			//getMover().handleCollisionWith(target, event.getDuration(), event.getMTV());
+			Transformable.transform(this, Transformation.transitionTransformation(event.getMTV().plus(1)));
 		}
 	}
 
@@ -211,7 +230,7 @@ public class TestPhysicObject extends SimpleGameObject implements Movable,
 	{
 		if (getTransformation() == null || getMover() == null || this.windowSize == null)
 			return;
-		
+		/*
 		Vector3D position = getTransformation().getPosition();
 		Vector3D oldVelocity = getMover().getVelocity();
 		Vector3D newVelocity = null;
@@ -227,6 +246,8 @@ public class TestPhysicObject extends SimpleGameObject implements Movable,
 		
 		if (newVelocity != null)
 			getMover().setVelocity(newVelocity);
+			*/
+		applyForce(new Vector3D(0, 1), getTransformation().getPosition());
 	}
 	
 	

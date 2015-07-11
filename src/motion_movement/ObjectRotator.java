@@ -208,7 +208,8 @@ public class ObjectRotator extends DependentGameObject<Rotateable> implements Ac
 	}
 	
 	/**
-	 * Calculates the impulse that should be applied to both of the given bodies upon collision
+	 * Calculates the impulse that should be applied to both of the given bodies upon 
+	 * collision. <b>This method is not working correctly at this time.</b>
 	 * @param body1 The primary colliding object
 	 * @param body2 The secondary colliding object
 	 * @param v1 The velocity of the primary object
@@ -236,10 +237,11 @@ public class ObjectRotator extends DependentGameObject<Rotateable> implements Ac
 		double J1Inverse = Math.pow(body1.getRotator().getCurrentMomentMass(), -1);
 		double J2Inverse = Math.pow(body2.getRotator().getCurrentMomentMass(), -1);
 		
+		// TODO: r should be calculated from the rotation axis
 		Vector3D r1 = absoluteContactPoint.minus(body1.getTransformation().getPosition());
 		Vector3D r2 = absoluteContactPoint.minus(body2.getTransformation().getPosition());
 	
-		// vp = v + vw
+		// vp = v + vw TODO: Test this without vw
 		Vector3D pointVelocity1 = v1.plus(getRailVelocity(r1, body1.getRotator().getRotation()));
 		Vector3D pointVelocity2 = v2.plus(getRailVelocity(r2, body2.getRotator().getRotation()));
 		//vr = vp1 - vp2 // TODO: Or is it vp2 - vp1?
@@ -248,13 +250,48 @@ public class ObjectRotator extends DependentGameObject<Rotateable> implements Ac
 		double jrLength = -(1 + efficiencyCoefficient) * vr.dotProduct(n) / 
 				(m1Inverse + m2Inverse + 
 				r1.crossProduct(n).times(J1Inverse).crossProduct(r1).plus(
-				r2.crossProduct(n).times(J2Inverse).crossProduct(r2)).crossProductLength(n));
+				r2.crossProduct(n).times(J2Inverse).crossProduct(r2)).dotProduct(n));
+		return mtv1.withLength(Math.abs(jrLength));
+	}
+	
+	/**
+	 * Calculates the impulse applied upon the object colliding on a solid wall etc. 
+	 * <b>This method is not working correctly at this time.</b>
+	 * @param body1 The object that is colliding
+	 * @param v1 The speed upon which the object is moving
+	 * @param efficiencyCoefficient How efficient the collision is [0, 1]
+	 * @param mtv1 The minimal translation vector of the collision
+	 * @param absoluteContactPoint The point at which the collision occurred
+	 * @return The impulse vector that should be applied to the object.
+	 */
+	public static Vector3D getCollisionImpulse(Rotateable body1, Vector3D v1, 
+			double efficiencyCoefficient, Vector3D mtv1, Vector3D absoluteContactPoint)
+	{
+		// ir = -(1 + e) * vr.dot(n) / 
+		// (m1^-1 + (J1^-1 * (r1 x n) x r1).dot(n))
+		// Where e = efficiencyCoefficient
+		// And n = mtv.reverse
+		// And vr is the speed of the pixel in the object
+		// Body 1 is affected by -jr and that is returned
+		
+		Vector3D n = mtv1.reverse().normalized();
+		double m1Inverse = Math.pow(body1.getMass(), -1);
+		double J1Inverse = Math.pow(body1.getRotator().getCurrentMomentMass(), -1);
+		
+		// TODO: r should be calculated from the rotation axis
+		Vector3D r1 = absoluteContactPoint.minus(body1.getTransformation().getPosition());
+	
+		// vp = v + vw TODO: Test this without vw
+		Vector3D vr = v1.plus(getRailVelocity(r1, body1.getRotator().getRotation()));
+		
+		double jrLength = -(1 + efficiencyCoefficient) * vr.dotProduct(n) / 
+				(m1Inverse  + r1.crossProduct(n).times(J1Inverse).crossProduct(r1).dotProduct(n));
 		return mtv1.withLength(Math.abs(jrLength));
 	}
 	
 	private static Vector3D getRailVelocity(Vector3D r, double rotationSpeed)
 	{
 		// v = r * w
-		return r.times(rotationSpeed).withZDirection(r.getZDirection() + 90);
+		return r.withZDirection(r.getZDirection() + 90).times(Math.toRadians(rotationSpeed));
 	}
 }

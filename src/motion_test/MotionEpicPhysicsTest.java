@@ -32,7 +32,7 @@ public class MotionEpicPhysicsTest
 	 */
 	public static void main(String[] args)
 	{
-		Vector3D windowSize = new Vector3D(800, 600);
+		Vector3D windowSize = new Vector3D(500, 500);
 		GameWindow window = new GameWindow(windowSize, "Motion test 4", true, 120, 
 				20);
 		GamePanel panel = window.getMainPanel().addGamePanel();
@@ -43,7 +43,15 @@ public class MotionEpicPhysicsTest
 		handlers.addHandler(new DrawableHandler(false, panel.getDrawer()));
 		new CollisionHandler(false, window.getHandlerRelay(), handlers);
 		
-		new TestPhysicObject(handlers, new Vector3D(150, 300), windowSize);
-		new TestPhysicObject(handlers, new Vector3D(650, 300), windowSize);
+		//new TestPhysicObject(handlers, new Vector3D(150, 250), windowSize);
+		//new TestPhysicObject(handlers, new Vector3D(350, 250), windowSize);
+		//new TestPhysicObject(handlers, new Vector3D(250, 150), windowSize);
+		//new TestPhysicObject(handlers, new Vector3D(250, 350), windowSize);
+		new TestPhysicObject(handlers, new Vector3D(250, 250), windowSize);
+		
+		new TestWall(handlers, new Vector3D(0, 0), new Vector3D(10, windowSize.getSecond()));
+		new TestWall(handlers, new Vector3D(0, 0), new Vector3D(windowSize.getFirst(), 10));
+		new TestWall(handlers, new Vector3D(0, windowSize.getSecond()), new Vector3D(windowSize.getFirst(), 10));
+		new TestWall(handlers, new Vector3D(windowSize.getFirst(), 0), new Vector3D(10, windowSize.getSecond()));
 	}
 }
