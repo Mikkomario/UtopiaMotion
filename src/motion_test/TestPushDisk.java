@@ -3,8 +3,6 @@ package motion_test;
 import java.awt.Color;
 import java.util.List;
 
-import omega_util.Transformable;
-import omega_util.Transformation;
 import genesis_event.Actor;
 import genesis_event.EventSelector;
 import genesis_event.HandlerRelay;
@@ -14,7 +12,8 @@ import genesis_event.MouseEvent.MouseButtonEventType;
 import genesis_event.MouseListener;
 import genesis_event.StrictEventSelector;
 import genesis_util.HelpMath;
-import genesis_util.StateOperator;
+import genesis_util.Transformable;
+import genesis_util.Transformation;
 import genesis_util.Vector3D;
 
 /**
@@ -54,12 +53,6 @@ public class TestPushDisk extends TestDisk implements Actor, MouseListener
 	
 	
 	// IMPLEMENTED METHODS	----------------
-
-	@Override
-	public StateOperator getListensToMouseEventsOperator()
-	{
-		return getIsActiveStateOperator();
-	}
 
 	@Override
 	public EventSelector<MouseEvent> getMouseEventSelector()

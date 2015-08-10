@@ -12,19 +12,18 @@ import genesis_event.MouseEvent.MouseButton;
 import genesis_event.MouseEvent.MouseButtonEventType;
 import genesis_event.MouseListener;
 import genesis_event.StrictEventSelector;
-import genesis_util.StateOperator;
+import genesis_util.SimpleHandled;
+import genesis_util.Transformation;
 import genesis_util.Vector3D;
 import motion_movement.ObjectRotator;
 import motion_movement.Rotateable;
-import omega_util.SimpleGameObject;
-import omega_util.Transformation;
 
 /**
  * This class is used for testing moments
  * @author Mikko Hilpinen
  * @since 21.3.2015
  */
-public class TestStick extends SimpleGameObject implements Rotateable, Drawable, MouseListener
+public class TestStick extends SimpleHandled implements Rotateable, Drawable, MouseListener
 {
 	// ATTRIBUTES	------------------------------
 	
@@ -85,12 +84,6 @@ public class TestStick extends SimpleGameObject implements Rotateable, Drawable,
 	public double getDefaultMomentMass()
 	{
 		return Rotateable.getStickMomentMass(getMass(), this.length, true);
-	}
-
-	@Override
-	public StateOperator getListensToMouseEventsOperator()
-	{
-		return getIsActiveStateOperator();
 	}
 
 	@Override
@@ -167,11 +160,5 @@ public class TestStick extends SimpleGameObject implements Rotateable, Drawable,
 	public int getDepth()
 	{
 		return 0;
-	}
-
-	@Override
-	public StateOperator getIsVisibleStateOperator()
-	{
-		return getIsActiveStateOperator();
 	}
 }

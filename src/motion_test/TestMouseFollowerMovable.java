@@ -4,8 +4,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 
-import omega_util.SimpleGameObject;
-import omega_util.Transformation;
 import motion_movement.Movable;
 import motion_movement.ObjectMover;
 import motion_movement.ObjectRotator;
@@ -16,7 +14,8 @@ import genesis_event.EventSelector;
 import genesis_event.HandlerRelay;
 import genesis_event.MouseEvent;
 import genesis_event.MouseListener;
-import genesis_util.StateOperator;
+import genesis_util.SimpleHandled;
+import genesis_util.Transformation;
 import genesis_util.Vector3D;
 
 /**
@@ -24,7 +23,7 @@ import genesis_util.Vector3D;
  * @author Mikko Hilpinen
  * @since 22.12.2014
  */
-public class TestMouseFollowerMovable extends SimpleGameObject implements
+public class TestMouseFollowerMovable extends SimpleHandled implements
 		Movable, MouseListener, Actor, Drawable, Rotateable
 {
 	// ATTRIBUTES	--------------------------
@@ -66,12 +65,6 @@ public class TestMouseFollowerMovable extends SimpleGameObject implements
 	public void setTrasformation(Transformation t)
 	{
 		this.transformation = t;
-	}
-
-	@Override
-	public StateOperator getListensToMouseEventsOperator()
-	{
-		return getIsActiveStateOperator();
 	}
 
 	@Override
@@ -156,12 +149,6 @@ public class TestMouseFollowerMovable extends SimpleGameObject implements
 	public int getDepth()
 	{
 		return 0;
-	}
-
-	@Override
-	public StateOperator getIsVisibleStateOperator()
-	{
-		return getIsActiveStateOperator();
 	}
 
 	@Override

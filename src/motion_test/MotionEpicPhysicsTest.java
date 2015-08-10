@@ -43,7 +43,7 @@ public class MotionEpicPhysicsTest
 		handlers.addHandler(new DrawableHandler(false, panel.getDrawer()));
 		new CollisionHandler(false, window.getHandlerRelay(), handlers);
 		
-		//new TestPhysicObject(handlers, new Vector3D(150, 250), windowSize);
+		new TestPhysicObject(handlers, new Vector3D(150, 250), windowSize);
 		//new TestPhysicObject(handlers, new Vector3D(350, 250), windowSize);
 		//new TestPhysicObject(handlers, new Vector3D(250, 150), windowSize);
 		//new TestPhysicObject(handlers, new Vector3D(250, 350), windowSize);

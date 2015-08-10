@@ -7,12 +7,11 @@ import java.awt.geom.AffineTransform;
 import genesis_event.Actor;
 import genesis_event.Drawable;
 import genesis_event.HandlerRelay;
-import genesis_util.StateOperator;
+import genesis_util.SimpleHandled;
+import genesis_util.Transformation;
 import genesis_util.Vector3D;
 import motion_movement.Movable;
 import motion_movement.ObjectMover;
-import omega_util.SimpleGameObject;
-import omega_util.Transformation;
 
 /**
  * This class is used for testing momentums. It's a bit grude for the lack of conflict module.
@@ -20,7 +19,7 @@ import omega_util.Transformation;
  * @author Mikko Hilpinen
  * @since 19.3.2015
  */
-public class TestDisk extends SimpleGameObject implements Movable, Drawable, Actor
+public class TestDisk extends SimpleHandled implements Movable, Drawable, Actor
 {
 	// ATTRIBUTES	-----------------------
 	
@@ -86,12 +85,6 @@ public class TestDisk extends SimpleGameObject implements Movable, Drawable, Act
 	public int getDepth()
 	{
 		return 0;
-	}
-
-	@Override
-	public StateOperator getIsVisibleStateOperator()
-	{
-		return getIsActiveStateOperator();
 	}
 
 	@Override

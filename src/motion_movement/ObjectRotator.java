@@ -1,10 +1,10 @@
 package motion_movement;
 
-import omega_util.DependentGameObject;
-import omega_util.Transformable;
-import omega_util.Transformation;
 import genesis_event.Actor;
 import genesis_event.HandlerRelay;
+import genesis_util.ConnectedHandled;
+import genesis_util.Transformable;
+import genesis_util.Transformation;
 import genesis_util.Vector3D;
 
 /**
@@ -13,7 +13,7 @@ import genesis_util.Vector3D;
  * @author Mikko Hilpinen
  * @since 23.12.2014
  */
-public class ObjectRotator extends DependentGameObject<Rotateable> implements Actor
+public class ObjectRotator extends ConnectedHandled<Rotateable> implements Actor
 {
 	// ATTRIBUTES	-------------------------
 	
@@ -49,9 +49,12 @@ public class ObjectRotator extends DependentGameObject<Rotateable> implements Ac
 	public void act(double duration)
 	{
 		// Applies the rotation
-		// angle += rotation * t + (0.5 * lastAcceleration * t^2)
-		double angleIncrement = getRotation() * duration + 
-				(0.5 * this.lastAcceleration * Math.pow(duration, 2));
+		// angle += rotation * t + (0.5 * lastAcceleration * t^2) // TODO: Probably not 
+		// working either
+		//double angleIncrement = getRotation() * duration + 
+		//		(0.5 * this.lastAcceleration * Math.pow(duration, 2));
+		this.rotation += this.acceleration;
+		double angleIncrement = getRotation() * duration;
 		
 		if (this.rotationOriginAtDefault)
 			Transformable.transform(getMaster(), 
@@ -62,11 +65,13 @@ public class ObjectRotator extends DependentGameObject<Rotateable> implements Ac
 					angleIncrement, getRotationOrigin()));
 		
 		// Adjusts the rotation
-		double averageAcceleration = (this.lastAcceleration + this.acceleration) / 2;
-		this.rotation += averageAcceleration * duration;
+		//double averageAcceleration = (this.lastAcceleration + this.acceleration) / 2;
+		//this.rotation += averageAcceleration * duration;
 		
 		// Remembers the latest acceleration
-		this.lastAcceleration = this.acceleration;
+		//this.lastAcceleration = this.acceleration;
+		
+	
 		this.acceleration = 0;
 	}
 

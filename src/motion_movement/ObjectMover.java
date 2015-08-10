@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import motion_util.Impulse;
-import omega_util.DependentGameObject;
-import omega_util.Transformation;
 import genesis_event.Actor;
 import genesis_event.HandlerRelay;
+import genesis_util.ConnectedHandled;
 import genesis_util.HelpMath;
+import genesis_util.Transformation;
 import genesis_util.Vector3D;
 
 /**
@@ -17,7 +17,7 @@ import genesis_util.Vector3D;
  * @author Mikko Hilpinen
  * @since 21.12.2014
  */
-public class ObjectMover extends DependentGameObject<Movable> implements Actor
+public class ObjectMover extends ConnectedHandled<Movable> implements Actor
 {
 	// ATTRIBUTES	--------------------------
 	
@@ -67,7 +67,8 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 		}
 		
 		// Applies the motion
-		// Position += velocity * t + (0.5 * lastAcceleration * t^2)
+		// Position += velocity * t + (0.5 * lastAcceleration * t^2) TODO: DOESN'T WORK PROPERLY
+		/*
 		getMaster().setTrasformation(getMaster().getTransformation().plus(
 				Transformation.transitionTransformation(
 				getVelocity().times(duration).plus(
@@ -79,6 +80,10 @@ public class ObjectMover extends DependentGameObject<Movable> implements Actor
 		
 		// Remembers the latest acceleration
 		this.lastAcceleration = getAcceleration();
+		*/
+		this.velocity = this.velocity.plus(getAcceleration().times(duration));
+		getMaster().setTrasformation(getMaster().getTransformation().plus(
+				Transformation.transitionTransformation(getVelocity().times(duration))));
 		this.acceleration = Vector3D.zeroVector();
 	}
 	

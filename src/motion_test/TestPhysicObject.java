@@ -14,15 +14,14 @@ import genesis_event.MouseListener;
 import genesis_event.StrictEventSelector;
 import genesis_event.MouseEvent.MouseButton;
 import genesis_util.HelpMath;
-import genesis_util.StateOperator;
+import genesis_util.SimpleHandled;
+import genesis_util.Transformable;
+import genesis_util.Transformation;
 import genesis_util.Vector3D;
 import motion_movement.Movable;
 import motion_movement.ObjectMover;
 import motion_movement.ObjectRotator;
 import motion_movement.Rotateable;
-import omega_util.SimpleGameObject;
-import omega_util.Transformable;
-import omega_util.Transformation;
 import conflict_collision.CollisionChecker;
 import conflict_collision.CollisionEvent;
 import conflict_collision.CollisionInformation;
@@ -33,7 +32,7 @@ import conflict_collision.CollisionListener;
  * @author Mikko Hilpinen
  * @since 22.3.2015
  */
-public class TestPhysicObject extends SimpleGameObject implements Movable,
+public class TestPhysicObject extends SimpleHandled implements Movable,
 		Rotateable, CollisionListener, MouseListener, Drawable, Actor
 {
 	// ATTRIBUTES	------------------------
@@ -91,12 +90,6 @@ public class TestPhysicObject extends SimpleGameObject implements Movable,
 	}
 
 	@Override
-	public StateOperator getCanBeCollidedWithStateOperator()
-	{
-		return getIsActiveStateOperator();
-	}
-
-	@Override
 	public CollisionInformation getCollisionInformation()
 	{
 		return this.collisionInformation;
@@ -119,18 +112,6 @@ public class TestPhysicObject extends SimpleGameObject implements Movable,
 	public int getDepth()
 	{
 		return 0;
-	}
-
-	@Override
-	public StateOperator getIsVisibleStateOperator()
-	{
-		return getIsActiveStateOperator();
-	}
-
-	@Override
-	public StateOperator getListensToMouseEventsOperator()
-	{
-		return getIsActiveStateOperator();
 	}
 
 	@Override
@@ -162,12 +143,6 @@ public class TestPhysicObject extends SimpleGameObject implements Movable,
 	public CollisionChecker getCollisionChecker()
 	{
 		return this.collisionChecker;
-	}
-
-	@Override
-	public StateOperator getListensForCollisionStateOperator()
-	{
-		return getIsActiveStateOperator();
 	}
 
 	@Override

@@ -6,10 +6,9 @@ import java.awt.geom.AffineTransform;
 
 import genesis_event.Drawable;
 import genesis_event.HandlerRelay;
-import genesis_util.StateOperator;
+import genesis_util.SimpleHandled;
+import genesis_util.Transformation;
 import genesis_util.Vector3D;
-import omega_util.SimpleGameObject;
-import omega_util.Transformation;
 import conflict_collision.Collidable;
 import conflict_collision.CollisionInformation;
 import conflict_util.Polygon;
@@ -19,7 +18,7 @@ import conflict_util.Polygon;
  * @author Mikko Hilpinen
  * @since 29.3.2015
  */
-public class TestWall extends SimpleGameObject implements Collidable, Drawable
+public class TestWall extends SimpleHandled implements Collidable, Drawable
 {
 	// ATTRIBUTES	------------------------------
 	
@@ -73,18 +72,6 @@ public class TestWall extends SimpleGameObject implements Collidable, Drawable
 	public int getDepth()
 	{
 		return 0;
-	}
-
-	@Override
-	public StateOperator getIsVisibleStateOperator()
-	{
-		return getIsActiveStateOperator();
-	}
-
-	@Override
-	public StateOperator getCanBeCollidedWithStateOperator()
-	{
-		return getIsActiveStateOperator();
 	}
 
 	@Override
